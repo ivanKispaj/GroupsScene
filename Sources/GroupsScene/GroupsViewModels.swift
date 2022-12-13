@@ -17,7 +17,9 @@ public final class GroupsViewModels: ObservableObject {
     public func loadData() async {
         
         await service.loadFromInternet(object: GroupsModel.self) { object in
-            
+            DispatchQueue.main.async {
+                self.data = object.response.items
+            }
             
         }
         

@@ -2,18 +2,47 @@
  
  
  */
-
+import Foundation
 import SwiftUI
-import LoadService
 
-@available(iOS 13.0, *)
+@available(iOS 16.0, *)
 public struct GroupsScene: View {
-    var service = LoadService(userId: "", method: .getGroups(token: "", userId: ""))
+    private var rowHeight: CGFloat = 80
+    @Binding var isSelected: Bool
+    @ObservedObject var viewModel: GroupsViewModels
+    
     public var body: some View {
-        ZStack {
-            Text("GroupScenePackage")
+        
+        NavigationStack {
+            
+            ZStack {
+                
+                List(viewModel.data) { group in
+                    
+                    GroupTableCell(groupName: group.groupName, logo: group.photoGroup, rowHeight: self.rowHeight)
+                     
+                        .listRowInsets(EdgeInsets(top: 0, leading: 0, bottom: 2, trailing: 0))
+                        .listRowSeparator(.hidden)
+                        .listRowBackground(Color.clear)
+                    
+                    
+                    
+                }
+                .listStyle(GroupedListStyle())
+                
+            }
+            .navigationTitle("Groups")
+            .navigationBarTitleDisplayMode(.inline)
+            
+        }
+        .task {
+            await self.viewModel.loadData()
         }
     }
     
-    public init(){}
+    public init(token: String, userId: String, isSelected: Binding<Bool>) {
+        self._isSelected = isSelected
+        self.viewModel = GroupsViewModels(token: token, userId: userId)
+    }
 }
+
